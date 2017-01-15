@@ -11,10 +11,10 @@ buildscript {
     }
 }
 plugins {
-    id 'java'
-    id 'jacoco'
-    id 'idea'
-    id 'org.jetbrains.intellij' version '0.1.10'
+    id 'java';
+    id 'jacoco';
+    id 'idea';
+    id 'org.jetbrains.intellij' version '0.1.10';
 }
 
 repositories {
@@ -180,10 +180,17 @@ idea.module {
     downloadSources = true;
     excludeDirs += file('.idea');
     excludeDirs += file('_support');
-    // TODO We should also tell IntelliJ automatically that csaccessTest contains test code.
-    // The following lines should really do it, but currently don't, which seems like a Gradle bug to me:
-    //def SourceSet catSourceSet = sourceSets.getByName(CustomSourceSetCreator.CSACCESSTEST_SOURCESET_NAME);
-    //testSourceDirs += catSourceSet.getJava().getSrcDirs();
-    //testSourceDirs += catSourceSet.getResources().getSrcDirs();
-    //scopes.TEST.plus += [configurations.getByName(catSourceSet.getRuntimeConfigurationName())];
+    // TODO csaccessTest should be recognized as test directories in IntelliJ
+    /*
+    def SourceSet catSourceSet = sourceSets.getByName(CustomSourceSetCreator.CSACCESSTEST_SOURCESET_NAME);
+    testSourceDirs += catSourceSet.getJava().getSrcDirs();
+    testSourceDirs += catSourceSet.getResources().getSrcDirs();
+    scopes.TEST.plus += [configurations.getByName(catSourceSet.getRuntimeConfigurationName())];
+    */
+    // stattdessen xml modifizieren:
+    iml {
+        withXml { final XmlProvider xml ->
+            CustomSourceSetCreator.flagTestFolders(project, xml);
+        }
+    }
 }

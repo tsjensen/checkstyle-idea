@@ -1,6 +1,13 @@
 package org.infernus.idea.checkstyle.build;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import groovy.util.Node;
 import org.gradle.api.Project;
+import org.gradle.api.XmlProvider;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.plugins.JavaPlugin;
@@ -109,5 +116,52 @@ public class CustomSourceSetCreator
                 .getClassesTaskName()));
 
         return this;
+    }
+
+
+    public static void flagTestFolders(final Project pProject, final XmlProvider pXml) {
+        final Node moduleNode = pXml.asNode();
+        // TODO
+        if ("module".equals(moduleNode.name())) {
+            final List<Node> sourceFolderNodes = findSourceFolderNodes(pProject, moduleNode);
+            pProject.getLogger().lifecycle("sourceFolderNodes.size() = " + sourceFolderNodes.size());
+            for (final Node sourceFolderNode : sourceFolderNodes) {
+                final Map<String, String> attributes = sourceFolderNode.attributes() != null ? sourceFolderNode
+                        .attributes() : Collections.emptyMap();
+                if (attributes.get("isTestSource") != null) {
+                    attributes.put("isTestSource", Boolean.TRUE.toString());
+                }
+                if (attributes.get("type") != null) {
+                    attributes.put("type", "java-test-resource");
+                }
+            }
+        }
+    }
+
+
+    private static List<Node> findSourceFolderNodes(final Project pProject, final Node pModuleNode) {
+        // module/component/content[url.contains("csaccessTest")]/sourceFolder
+        final List<Node> result = new ArrayList<>();
+        for (final Object childOfModule : pModuleNode.children()) {
+            if (childOfModule instanceof Node && "component".equals(((Node) childOfModule).name())) {
+                for (final Object childOfComp : ((Node) childOfModule).children()) {
+                    if (childOfComp instanceof Node && "content".equals(((Node) childOfComp).name())) {
+                        final Node contentNode = (Node) childOfComp;
+                        final String urlAttr = (String) contentNode.attribute("url");
+                        pProject.getLogger().lifecycle("urlAttr.value = " + urlAttr);
+                        if (urlAttr != null && urlAttr.contains(CSACCESSTEST_SOURCESET_NAME)) {
+                            for (final Object childOfContent : contentNode.children()) {
+                                pProject.getLogger().lifecycle("childOfContent = " + ((Node) childOfContent).name());
+                                if (childOfContent instanceof Node && "sourceFolder".equals(((Node) childOfContent)
+                                        .name())) {
+                                    result.add((Node) childOfContent);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 }
