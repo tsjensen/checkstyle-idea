@@ -18,9 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 
 /**
- * Received Checkstyle-IDEA settings from IntelliJ's Gradle extension.
- *
- * @author Thomas Jensen
+ * Receives Checkstyle-IDEA settings from IntelliJ's Gradle extension.
  */
 public class CheckstyleProjectDataService
         implements ProjectDataService<Map<String, String>, PluginConfigDto>
