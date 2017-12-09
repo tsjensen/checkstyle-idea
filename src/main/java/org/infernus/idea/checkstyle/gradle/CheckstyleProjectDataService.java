@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
 import com.intellij.openapi.externalSystem.model.project.ProjectData;
@@ -23,6 +24,8 @@ import org.jetbrains.annotations.Nullable;
 public class CheckstyleProjectDataService
         implements ProjectDataService<Map<String, String>, PluginConfigDto>
 {
+    private static final Logger LOG = Logger.getInstance(CheckstyleProjectDataService.class);
+
     @NotNull
     @SuppressWarnings("unchecked")
     public static final Key<Map<String, String>> KEY = Key.create((Class<Map<String, String>>) new HashMap<String,
@@ -44,6 +47,7 @@ public class CheckstyleProjectDataService
     ProjectData projectData, @NotNull final Project project, @NotNull final IdeModifiableModelsProvider
             modelsProvider) {
         // TODO implement importData()
+        LOG.debug("projectData = " + projectData);
     }
 
 
